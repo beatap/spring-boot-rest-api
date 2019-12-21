@@ -1,6 +1,9 @@
 package pl.beata.springbootrestapi.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,8 @@ import pl.beata.springbootrestapi.services.CarService;
 
 import java.util.List;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
 @RestController
 @RequestMapping("/cars")
 public class CarController {
@@ -31,33 +36,36 @@ public class CarController {
 
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<List<Car>> getCars() {
+    public ResponseEntity<Resources<Car>> getCars() {
         List<Car> cars = carService.getCars();
 
         if(cars != null && !cars.isEmpty()) {
-            return new ResponseEntity<>(cars, HttpStatus.OK);
+            return new ResponseEntity<>(getResources(cars), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<Car> getCarById(@PathVariable long id) {
-        Car car = carService.getCarById(id);
+    @GetMapping(path = "/{carId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<Resource<Car>> getCarById(@PathVariable long carId) {
+        Car car = carService.getCarById(carId);
 
         if(car != null) {
-            return new ResponseEntity<>(car, HttpStatus.OK);
+            Link link = linkTo(CarController.class).slash(carId).withSelfRel();
+            Resource<Car> carResource = new Resource<>(car, link);
+
+            return new ResponseEntity<>(carResource, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(path = "/color/{color}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<List<Car>> getCarsByColor(@PathVariable String color) {
+    public ResponseEntity<Resources<Car>> getCarsByColor(@PathVariable String color) {
         List<Car> cars = carService.getCarsByColor(color);
 
         if(cars != null && !cars.isEmpty()) {
-            return  new ResponseEntity<>(cars, HttpStatus.OK);
+            return  new ResponseEntity<>(getResources(cars), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -75,10 +83,22 @@ public class CarController {
 
     }
 
-    @PutMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<String> modifyCarByParam(@PathVariable long id, @RequestParam(required = false, defaultValue = "") String model,
+
+    @PutMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<String> modifyCar(@RequestBody Car car) {
+        boolean ismodCar = carService.modifyCar(car);
+
+        if(ismodCar) {
+            return new ResponseEntity<>("Success modified car.", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("No data object modify or other error!", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PutMapping(path = "/{carId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<String> modifyCarByParam(@PathVariable long carId, @RequestParam(required = false, defaultValue = "") String model,
                                            @RequestParam(required = false, defaultValue = "") String mark, @RequestParam(required = false, defaultValue = "") String color) {
-        boolean modCar = carService.modifyCarByParam(id, model, mark, color);
+        boolean modCar = carService.modifyCarByParam(carId, model, mark, color);
 
         if(modCar) {
             return new ResponseEntity<>("Success modified car.", HttpStatus.OK);
@@ -87,9 +107,9 @@ public class CarController {
         return new ResponseEntity<>("No data to modify or other error!", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity removeCar(@PathVariable  long id) {
-        boolean delCar = carService.removeCar(id);
+    @DeleteMapping(path = "/{carId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity removeCar(@PathVariable  long carId) {
+        boolean delCar = carService.removeCar(carId);
 
         if(delCar) {
             return new ResponseEntity(HttpStatus.OK);
@@ -97,5 +117,14 @@ public class CarController {
 
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
+
+
+   private Resources<Car> getResources(List<Car> cars) {
+       cars.forEach(car -> car.add(linkTo(CarController.class).slash(car.getCarId()).withSelfRel()));
+       Link link = linkTo(CarController.class).withSelfRel();
+       Resources<Car> carResources = new Resources<>(cars, link);
+
+       return carResources;
+   }
 
 }

@@ -29,8 +29,8 @@ public class CarService {
         return cars;
     }
 
-    public Car getCarById(long id) {
-        Optional<Car> car = findFirst(id);
+    public Car getCarById(long carId) {
+        Optional<Car> car = findFirst(carId);
 
         if(car.isPresent()) {
             return car.get();
@@ -45,7 +45,7 @@ public class CarService {
     }
 
     public boolean addCar(Car car) {
-        if(findFirst(car.getId()).isPresent()) {
+        if(findFirst(car.getCarId()).isPresent()) {
             return false;
         }
 
@@ -54,7 +54,7 @@ public class CarService {
 
     public boolean modifyCar(Car car) {
 
-        if(findFirst(car.getId()).isPresent()) {
+        if(findFirst(car.getCarId()).isPresent()) {
             cars.add(cars.indexOf(car), car);
 
             return true;
@@ -64,8 +64,8 @@ public class CarService {
 
     }
 
-    public boolean modifyCarByParam(long id, String model, String mark, String color) {
-        Optional<Car> car = findFirst(id);
+    public boolean modifyCarByParam(long carId, String model, String mark, String color) {
+        Optional<Car> car = findFirst(carId);
         if(car.isPresent()) {
             Car newCar = car.get();
 
@@ -93,8 +93,8 @@ public class CarService {
         return false;
     }
 
-    public boolean removeCar(long id) {
-        Optional<Car> car = findFirst(id);
+    public boolean removeCar(long carId) {
+        Optional<Car> car = findFirst(carId);
 
         if(car.isPresent()) {
             return cars.remove(car.get());
@@ -103,8 +103,8 @@ public class CarService {
         return false;
     }
 
-    private Optional<Car> findFirst(long id) {
+    private Optional<Car> findFirst(long carId) {
 
-        return cars != null ? cars.stream().filter(c -> c.getId() == id).findFirst() : Optional.empty();
+        return cars != null ? cars.stream().filter(c -> c.getCarId() == carId).findFirst() : Optional.empty();
     }
 }
