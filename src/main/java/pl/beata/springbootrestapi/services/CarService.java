@@ -50,12 +50,18 @@ public class CarService {
         }
 
         return cars != null ? cars.add(car) : false;
+
     }
 
     public boolean modifyCar(Car car) {
+        Optional<Car> findCar = findFirst(car.getCarId());
+        if(findCar.isPresent()) {
+            Car modCar = findCar.get();
 
-        if(findFirst(car.getCarId()).isPresent()) {
-            cars.add(cars.indexOf(car), car);
+            modCar.setMark(car.getMark());
+            modCar.setModel(car.getModel());
+            modCar.setColor(car.getColor());
+
 
             return true;
         }
@@ -69,19 +75,19 @@ public class CarService {
         if(car.isPresent()) {
             Car newCar = car.get();
 
-            if(!model.equals("")) {
+            if(!model.isBlank()) {
                 newCar.setModel(model);
             }
 
-            if(!mark.equals("")) {
+            if(!mark.isBlank()) {
                 newCar.setMark(mark);
             }
 
-            if(!color.equals("")) {
+            if(!color.isBlank()) {
                 newCar.setColor(color);
             }
 
-            if(!model.equals("") || !mark.equals("") || !color.equals("")) {
+            if(!model.isBlank() || !mark.isBlank() || !color.isBlank()) {
 
                 return true;
             }
@@ -96,11 +102,7 @@ public class CarService {
     public boolean removeCar(long carId) {
         Optional<Car> car = findFirst(carId);
 
-        if(car.isPresent()) {
-            return cars.remove(car.get());
-        }
-
-        return false;
+        return car.map(c -> cars.remove(c)).orElse(false);
     }
 
     private Optional<Car> findFirst(long carId) {
