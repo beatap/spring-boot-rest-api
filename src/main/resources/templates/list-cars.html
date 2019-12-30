@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>List of cars</title>
+
+    <link href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
 </head>
 <body>
 
     <div>
         <h1>List of Cars</h1>
 
-        <a href="/showAdd">Add Car</a><br><br>
+        <a href="/showAdd" class="primaryBtn">Add Car</a><br><br>
 
         <table>
             <thead>
@@ -27,8 +30,8 @@
                     <td th:text="${car.mark}" />
                     <td th:text="${car.model}" />
                     <td th:text="${car.color}" />
-                    <td><a th:href="@{/modify/{carId}(carId=${car.carId})}">Edit</a></td>
-                    <td><a th:href="@{/delete/{carId}(carId=${car.carId})}">Delete</a></td>
+                    <td><a th:href="@{/modify/{carId}(carId=${car.carId})}"><i class="fas fa-edit ml-2"></i></a></td>
+                    <td><a th:href="@{/delete/{carId}(carId=${car.carId})}"><i class="fas fa-times ml-2"></i></a></td>
                 </tr>
             </tbody>
         </table>
