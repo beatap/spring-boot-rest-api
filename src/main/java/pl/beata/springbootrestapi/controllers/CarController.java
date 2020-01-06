@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.beata.springbootrestapi.model.Car;
 import pl.beata.springbootrestapi.services.CarService;
+import pl.beata.springbootrestapi.util.MessageResponse;
 
 import java.util.List;
 
@@ -76,10 +77,10 @@ public class CarController {
         boolean isNewCar = carService.addCar(car);
 
         if (isNewCar) {
-            return new ResponseEntity<>("Success add car.", HttpStatus.CREATED);
+            return new ResponseEntity<>(MessageResponse.SUCCESS_ADD, HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<>("Not create. Such a car exists or other error!", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(MessageResponse.ERROR_ADD, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
@@ -89,10 +90,10 @@ public class CarController {
         boolean ismodCar = carService.modifyCar(car);
 
         if(ismodCar) {
-            return new ResponseEntity<>("Success modified car.", HttpStatus.OK);
+            return new ResponseEntity<>(MessageResponse.SUCCESS_MOD, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>("No data object modify or other error!", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(MessageResponse.ERROR_MOD, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PutMapping(path = "/{carId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -101,10 +102,10 @@ public class CarController {
         boolean modCar = carService.modifyCarByParam(carId, model, mark, color);
 
         if(modCar) {
-            return new ResponseEntity<>("Success modified car.", HttpStatus.OK);
+            return new ResponseEntity<>(MessageResponse.SUCCESS_MOD, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>("No data to modify or other error!", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(MessageResponse.ERROR_MOD, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DeleteMapping(path = "/{carId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
