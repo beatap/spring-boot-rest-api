@@ -1,20 +1,22 @@
 package pl.beata.springbootrestapi.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import pl.beata.springbootrestapi.model.Car;
 import pl.beata.springbootrestapi.services.CarService;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Controller
 public class CarController {
 
-    CarService carService;
+    private CarService carService;
+    private static final String MODEL_CARS = "cars";
 
     @Autowired
     public CarController(CarService carService) {
@@ -24,8 +26,16 @@ public class CarController {
 
     @GetMapping("/all")
     public String getCars(Model model) {
-        List<Car> cars = carService.getCars();
-        model.addAttribute("cars", cars);
+        model.addAttribute(MODEL_CARS, carService.getCars());
+
+        return "list-cars";
+    }
+
+    @GetMapping("/search")
+    public String getCarsByYear(Model model,
+                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
+        model.addAttribute(MODEL_CARS, carService.getByYear(from, to));
 
         return "list-cars";
     }
@@ -38,33 +48,7 @@ public class CarController {
 
     @PostMapping("/add")
     public String addCar(Car car) {
-        int size = carService.getCars().size();
-        car.setCarId(size+1);
-
         carService.addCar(car);
-
-        return "redirect:/all";
-    }
-
-    @GetMapping("/modify/{carId}")
-    public String modifyCarById(@PathVariable long carId, Model model) {
-        Car car = carService.getCarById(carId);
-        model.addAttribute("car", car);
-
-        return "update-car";
-    }
-
-    @PostMapping("/update/{carId}")
-    public String updateCar(@PathVariable long carId, Car car) {
-
-        carService.modifyCar(car);
-
-        return "redirect:/all";
-    }
-
-    @GetMapping("/delete/{carId}")
-    public String removeCar(@PathVariable  long carId) {
-        carService.removeCar(carId);
 
         return "redirect:/all";
     }

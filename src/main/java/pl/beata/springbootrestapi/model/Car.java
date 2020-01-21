@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,4 +21,6 @@ public class Car {
     private String mark;
     private String model;
     private String color;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate year;
 }

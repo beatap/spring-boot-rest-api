@@ -14,14 +14,22 @@
 
         <a href="/showAdd" class="primaryBtn">Add Car</a><br><br>
 
+        <div>
+            <p>Search</p>
+            <form th:action="@{/search}" method="get">
+                <p>Year from: <input type="date" th:name="from"></p>
+                <p>Year to: <input type="date" th:name="to"></p>
+
+                <input type="submit" class="primaryBtn" value="Search">
+            </form>
+        </div>
         <table>
             <thead>
                 <tr>
                     <th>Mark</th>
                     <th>Model</th>
                     <th>Color</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    <th>Year</th>
                 </tr>
             </thead>
 
@@ -30,8 +38,7 @@
                     <td th:text="${car.mark}" />
                     <td th:text="${car.model}" />
                     <td th:text="${car.color}" />
-                    <td><a th:href="@{/modify/{carId}(carId=${car.carId})}"><i class="fas fa-edit ml-2"></i></a></td>
-                    <td><a th:href="@{/delete/{carId}(carId=${car.carId})}"><i class="fas fa-times ml-2"></i></a></td>
+                    <td th:text="${#temporals.format(car.year, 'yyyy')}" />
                 </tr>
             </tbody>
         </table>
